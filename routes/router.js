@@ -3,10 +3,14 @@ const router = express.Router();
 
 const { validateRegister, isLoggedIn } = require('../middleware/users.js');
 const controllerUser = require('../controllers/user')
-const controllerPatient = require('../controllers/patient')
+//const controllerPatient = require('../controllers/patient')
 
 // http://localhost:3000/api/sign-up
-router.post('/sign-up', validateRegister, controllerUser.register)
+router.post('/user', validateRegister, controllerUser.register)
+router.put('/user', validateRegister, controllerUser.update)
+router.delete('/user/:userDocument', controllerUser.delete)
+router.get('/user', controllerUser.get)
+router.get('/user/:userDocument', controllerUser.getByUserDocument)
 
 // http://localhost:3000/api/login
 router.post('/auth/login', controllerUser.login)
