@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
+
 const db = require('../lib/db.js');
 const uuid = require('uuid');
 
@@ -24,16 +26,20 @@ const userController = {
                     if(err){
                         throw err;
                         return res.status(500).send({
-                            message: err
+                            message: err.code
                         }) ;
                     }else{
-                        db.query(`INSERT INTO user (idUser, UserDocument, username, name, UserLast_name, UserEntity, UserEmail, password,profesionalRegister, Rol_idRol,UserActive) 
-                        VALUES ('${uuid.v4()}', ${db.escape(req.body.userDocument)}, ${db.escape(req.body.username)}, ${db.escape(req.body.name)}, ${db.escape(req.body.UserLast_name)},
+                        db.query(`INSERT INTO user (idUser, UserDocument, username, name, UserLastName, UserEntity, UserEmail, password,profesionalRegister, Rol_idRol,UserActive) 
+                        VALUES ('${uuid.v4()}', ${db.escape(req.body.UserDocument)}, ${db.escape(req.body.username)}, ${db.escape(req.body.name)}, ${db.escape(req.body.UserLastName)},
                         ${db.escape(req.body.UserEntity)}, ${db.escape(req.body.UserEmail)},'${hash}', 
-                        ${db.escape(req.body.profesionalRegister)}, ${db.escape(req.body.Rol)}, ${db.escape(req.body.UserActive)});`,
+                        ${db.escape(req.body.profesionalRegister)}, ${db.escape(req.body.Rol_idRol)}, ${db.escape(req.body.UserActive)});`,
                         (err, result) => {
                             if(err){
-                                throw err;
+                                if (err.code === "ER_DUP_ENTRY"){
+                                    return res.status(400).send({
+                                        message: "Documento ya esta registrado"
+                                    });
+                                }
                                 return res.status(400).send({
                                     message: err
                                 });
@@ -125,7 +131,7 @@ const userController = {
             }
         )
     }, update : async ( req, res, next)=>{
-        db.query(`SELECT * FROM user WHERE userDocument = ${db.escape(req.body.userDocument)};`,
+        db.query(`SELECT * FROM user WHERE userDocument = ${db.escape(req.body.UserDocument)};`,
         (err, result) =>{
             if(err){
                 throw err;
@@ -138,15 +144,14 @@ const userController = {
                     message: "Usuario no existe en el sistema."
                 });
             }
-            db.query(`UPDATE user SET
-             UserDocument = ${db.escape(req.body.userDocument)}, 
+            db.query(`UPDATE user SET 
              name=${db.escape(req.body.name)},
-             UserLast_name =${db.escape(req.body.UserLast_name)},
+             UserLastName =${db.escape(req.body.UserLastName)},
              UserEntity =${db.escape(req.body.UserEntity)}, 
              UserEmail=${db.escape(req.body.UserEmail)}, 
              password= ${db.escape(req.body.password)},
              profesionalRegister=${db.escape(req.body.profesionalRegister)},
-             Rol_idRol =${db.escape(req.body.Rol)},
+             Rol_idRol =${db.escape(req.body.Rol_idRol)},
              UserActive = ${db.escape(req.body.UserActive)} WHERE idUser = '${result[0].idUser}';`,
             (err, result) => {
                 if(err){
