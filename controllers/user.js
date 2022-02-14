@@ -12,8 +12,8 @@ const uuid = require('uuid');
 
 
 const userController = {
-    register: async (req, res, next) => {
-        db.query(`SELECT * FROM user WHERE LOWER(username) = LOWER(${db.escape(req.body.username)});`, 
+    register: async (req, res, next) => {// Create user
+        db.query(`SELECT * FROM user WHERE LOWER(Username) = LOWER(${db.escape(req.body.Username)});`, 
         (err, result) => {
             if(result && result.length){
                 // error
@@ -29,8 +29,8 @@ const userController = {
                             message: err.code
                         }) ;
                     }else{
-                        db.query(`INSERT INTO user (idUser, UserDocument, username, name, UserLastName, UserEntity, UserEmail, password,profesionalRegister, Rol_idRol,UserActive) 
-                        VALUES ('${uuid.v4()}', ${db.escape(req.body.UserDocument)}, ${db.escape(req.body.username)}, ${db.escape(req.body.name)}, ${db.escape(req.body.UserLastName)},
+                        db.query(`INSERT INTO user (idUser, UserDocument,TypeDocument,Username, name, UserLastName, UserEntity, UserEmail, password,profesionalRegister, Rol_idRol,UserActive) 
+                        VALUES ('${uuid.v4()}', ${db.escape(req.body.UserDocument)},${db.escape(req.body.TypeDocument)}, ${db.escape(req.body.Username)}, ${db.escape(req.body.name)}, ${db.escape(req.body.UserLastName)},
                         ${db.escape(req.body.UserEntity)}, ${db.escape(req.body.UserEmail)},'${hash}', 
                         ${db.escape(req.body.profesionalRegister)}, ${db.escape(req.body.Rol_idRol)}, ${db.escape(req.body.UserActive)});`,
                         (err, result) => {
@@ -58,7 +58,7 @@ const userController = {
 
     login : async (req, res, next) => {
         db.query(
-            `SELECT * FROM user WHERE username = ${db.escape(req.body.username)};`,
+            `SELECT * FROM user WHERE Username = ${db.escape(req.body.Username)};`,
             (err, result) => {
                 if(err){
                     throw err;
@@ -67,8 +67,10 @@ const userController = {
                     });
                 }
                 if(!result.length){
+                    Console.log(user)
                     return res.status(400).send({
                         message: 'Username o password incorrectos!'
+                        
                     });
                 }
                 bcrypt.compare(req.body.password, result[0]['password'], 
@@ -81,12 +83,12 @@ const userController = {
                     }
                     if(bResult){ // password Match
                         const token = jwt.sign({
-                            username: result[0].username,
+                            Username: result[0].Username,
                             userId: result[0].id,
                         }, process.env.SECRETKEY,
                         { expiresIn: "1d"}
                         );
-                        db.query(`UPDATE user SET last_login = now() WHERE id = '${result[0].id}';`);
+                        //db.query(`UPDATE user SET last_login = now() WHERE id = '${result[0].id}';`);
                         return res.status(200).send({
                             message: 'Logged in!',
                             token,
@@ -131,7 +133,7 @@ const userController = {
             }
         )
     }, update : async ( req, res, next)=>{
-        db.query(`SELECT * FROM user WHERE userDocument = ${db.escape(req.body.UserDocument)};`,
+        db.query(`SELECT * FROM user WHERE UserDocument = ${db.escape(req.body.UserDocument)};`,
         (err, result) =>{
             if(err){
                 throw err;
@@ -146,6 +148,7 @@ const userController = {
             }
             db.query(`UPDATE user SET 
              name=${db.escape(req.body.name)},
+             UserEntity =${db.escape(req.body.TypeDocument)}, 
              UserLastName =${db.escape(req.body.UserLastName)},
              UserEntity =${db.escape(req.body.UserEntity)}, 
              UserEmail=${db.escape(req.body.UserEmail)}, 

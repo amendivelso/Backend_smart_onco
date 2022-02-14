@@ -4,9 +4,9 @@ const res = require('express/lib/response');
 const jwt = require('jsonwebtoken');
 
 module.exports = {
-    validateRegister: (req, res, next) => {
+    validateRegister: (req, res, next) => { 
         // username min length 3
-        if(!req.body.username || req.body.username.length < 3){
+        if(!req.body.Username || req.body.Username.length < 3){
             return res.status(400).send({
                 message: "Por favor ingrese un username de mínimo tres caracteres."
             });

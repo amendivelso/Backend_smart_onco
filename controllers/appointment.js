@@ -1,33 +1,28 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../lib/db.js');
-const uuid = require('uuid');
 
-const patientController = { 
+const appointmentController = { 
     
-    createPatient: async (req, res, next) => {
+    createAppointment: async (req, res, next) => {
         db.query(`SELECT * FROM patient WHERE idPatient(${db.escape(req.body.idPatient)});`, 
         (err, result) => {
             if(result && result.length){
                 // error
                 return res.status(400).send({
-                    message: 'El usuario ya existe en el sistema'
+                    message: 'Historia ya existe en el sistema'
                 })
             }else{ 
-                db.query(`INSERT INTO patient (idPatient, patientDocument,firstName,secondName, firstLastName, secondLastName,sex, age, birthday, activity, email1, email2, address, zone, nacionality, active, patientNeighborhood, patientTypeId, patientCity, patientDepartment, patientPhone1,patientPhone2,EPSName,regimenEPS,tutela,familyTypeID,familyID,familyFirstName,familySecondName,familyFirstLastname,familySecondLastname,familyAddress,familyNeighborhood,familyCity,familyDepartment,familyEmail1,familyEmail2,familyPhone1,familyPhone2) VALUES 
-                ('${uuid.v4()}', ${db.escape(req.body.patientDocument)}, ${db.escape(req.body.firstName)}, 
-                ${db.escape(req.body.secondName)}, ${db.escape(req.body.firstLastName)}, ${db.escape(req.body.secondLastName)},
-                ${db.escape(req.body.sex)}, ${db.escape(req.body.age)}, ${db.escape(req.body.birthday)},
-                ${db.escape(req.body.activity)},${db.escape(req.body.email1)}, ${db.escape(req.body.email2)}, 
-                ${db.escape(req.body.address)}, ${db.escape(req.body.zone)}, ${db.escape(req.body.nacionality)}, 
-                ${db.escape(req.body.active)}, ${db.escape(req.body.patientNeighborhood)}, ${db.escape(req.body.patientTypeId)},     
-                ${db.escape(req.body.patientCity)}, ${db.escape(req.body.patientDepartment)}, ${db.escape(req.body.patientPhone1)},
-                ${db.escape(req.body.patientPhone2)}, ${db.escape(req.body.EPSName)}, ${db.escape(req.body.regimenEPS)},
-                ${db.escape(req.body.tutela)}, ${db.escape(req.body.familyTypeID)}, ${db.escape(req.body.familyID)},         
-                ${db.escape(req.body.familyFirstName)}, ${db.escape(req.body.familySecondname)}, ${db.escape(req.body.familyFirstLastname)},  
-                ${db.escape(req.body.familySecondLastname)}, ${db.escape(req.body.familyAddress)}, ${db.escape(req.body.familyNeighborhood)},   
-                ${db.escape(req.body.familyCity)}, ${db.escape(req.body.familyDepartment)}, ${db.escape(req.body.familyEmail1)},         
-                ${db.escape(req.body.familyEmail2)}, ${db.escape(req.body.familyPhone1)}, ${db.escape(req.body.familyPhone2)})`,
+                db.query(`INSERT INTO idappointment (idappointment, date, place, address, consultingRoom, recomendations,patient_idPatient,User_idUser) VALUES 
+                ('${uuid.v4()}', 
+                ${db.escape(req.body.date)},  
+                ${db.escape(req.body.place)},
+                ${db.escape(req.body.address)}, 
+                ${db.escape(req.body.consultingRoom)}, 
+                ${db.escape(req.body.address)}, 
+                ${db.escape(req.body.recomendations)},     
+                ${db.escape(req.body.patient_idPatient)}, 
+                ${db.escape(req.body.User_idUser)}`,
                 (err, result) => {
                     if(err){
                         if (err.code === "ER_DUP_ENTRY"){
@@ -40,7 +35,7 @@ const patientController = {
                         });
                     }
                     return res.status(201).send({
-                        message: "Usuario registrado con éxito..."
+                        message: "cita registrada con éxito..."
                     })
                     
                 });
@@ -49,8 +44,8 @@ const patientController = {
         })
 
     }
-    ,deletePatient: async( req, res, next)=>{
-        db.query(`SELECT * FROM patient WHERE patientDocument = ${db.escape(req.params.patientDocument)};`,
+    ,deleteAppointment: async( req, res, next)=>{
+        db.query(`SELECT * FROM   WHERE idappointment = ${db.escape(req.params.idappointment)};`,
             (err, result) => {
                 if(err){
                     throw err;
@@ -63,7 +58,7 @@ const patientController = {
                         message: "Paciente no existe en el sistema."
                     });
                 }
-                db.query(`DELETE FROM patient WHERE idPatient = '${result[0].idPatient}';`,
+                db.query(`DELETE FROM idappointment WHERE idappointment = '${result[0].idappointment}';`,
                 (err, result) => {
                     if(err){
                         throw err;
@@ -78,8 +73,8 @@ const patientController = {
                 
             }
         )
-    },getPatient: async( req, res, next)=>{
-        db.query(`SELECT * FROM patient ;`,
+    },getAppointment: async( req, res, next)=>{
+        db.query(`SELECT * FROM appointment ;`,
             (err, result) => {
                 if(err){
                     throw err;
@@ -98,7 +93,7 @@ const patientController = {
                 
             }
         )
-    },getBypatientDocument: async( req, res, next)=>{
+    },getByAppointmentDocument: async( req, res, next)=>{
         db.query(`SELECT * FROM patient WHERE patientDocument = ${db.escape(req.params.patientDocument)};`,
         (err, result) => {
             if(err){
@@ -187,4 +182,3 @@ const patientController = {
     }
 }
 module.exports =  patientController;
-    
